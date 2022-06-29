@@ -24,3 +24,6 @@ the Snapir AUV in the Mediterranean Sea, collecting approximately four hours
 of DVL and inertial sensor data. Our results show that the proposed approach
 achieved an improvement of more than 60% in estimating the DVL velocity
 vector
+
+## Architectures
+
