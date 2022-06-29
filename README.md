@@ -27,7 +27,7 @@ vector
 
 ## Architectures
 
-####BeamsNetV1 architecture
+#### BeamsNetV1 architecture
 ![Alt text](/Figures/BeamsNetV1.png "BeamsNetV1 architecture")
 
 To cope with the different input sizes, BeamsNetV1 architecture
@@ -44,7 +44,7 @@ layer that produces the 3×1 vector, which is the estimated DVL velocity vector.
 The architecture and the activation functions after each layer are presented in
 Figure above.
 
-####BeamsNetV2 architecture
+#### BeamsNetV2 architecture
 ![Alt text](/Figures/BeamsNetV2.png "BeamsNetV2 architecture")
 
 The network’s input is n past samples of the DVL beam measurements. Same as for
