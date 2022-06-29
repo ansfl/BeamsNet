@@ -25,6 +25,20 @@ of DVL and inertial sensor data. Our results show that the proposed approach
 achieved an improvement of more than 60% in estimating the DVL velocity
 vector
 
+## Dataset
+
+The dataset was collected using the "Snapir" AUV in Mediterranean Sea. The
+Snapir is an A18-D, ECA GROUP mid-size AUV for deep water applications.
+Capable of rapidly and accurately mapping large areas of the sea floor, Snapir
+has a length of 5.5[m], a diameter of 0.5[m], 24 hours’ endurance, and a depth
+rating of 3000[m]. Snapir carries several sensors as its payload, including an
+interferometric authorized synthetic aperture sonar (SAS) and Teledyne RD
+Instruments, Navigator DVL.
+
+![Alt text](/Figures/snapir.png "Snapir AUV")
+
+
+
 ## Architectures
 
 #### BeamsNetV1 architecture
