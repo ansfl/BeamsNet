@@ -15,9 +15,8 @@ from numpy.linalg import inv
 from sklearn.metrics import mean_squared_error
 from numpy import linalg as LA
 from torch.utils.data import Dataset
-import seaborn as sns
 
-sns.set()
+
 # Seeds
 torch.manual_seed(0)
 np.random.seed(0)

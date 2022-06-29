@@ -1,14 +1,10 @@
 ################## Imports ##################
 
 import torch
-import scipy
-from scipy.fft import fft, ifft, fftshift, ifftshift
+
 import torch.nn as nn
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import torch.nn.functional as F
-from numpy import save
 from numpy import load
 from numpy import transpose
 from numpy import cos
@@ -16,12 +12,9 @@ from numpy import sin
 from numpy.random.mtrand import random
 from numpy.linalg import inv
 from sklearn.metrics import mean_squared_error
-import random
 from numpy import linalg as LA
 from torch.utils.data import Dataset, DataLoader
-from datetime import datetime
-from torch.optim.lr_scheduler import ExponentialLR
-from torch.optim.lr_scheduler import StepLR
+import os
 
 # Seeds
 torch.manual_seed(0)
@@ -29,9 +22,9 @@ np.random.seed(0)
 
 
 ################## DNN ##################
-class SmoothNetV2(nn.Module):
-    def __init__(self, T):
-        super(SmoothNetV2, self).__init__()
+class BeamsNetV2(nn.Module):
+    def __init__(self):
+        super(BeamsNetV2, self).__init__()
         self.conv_layer = nn.Sequential(
             nn.Conv1d(in_channels=T, out_channels=6,
                       kernel_size=2, stride=1),
@@ -63,61 +56,6 @@ class SmoothNetV2(nn.Module):
                 nn.init.kaiming_uniform_(m.weight)
             if isinstance(m, nn.Linear):
                 nn.init.kaiming_uniform_(m.weight)
-
-
-def batch_gd(model, criterion, optimizer, scheduler, X_train1, X_train2, y_train, X_test1, X_test2, y_test, epochs):
-    train_losses = np.zeros(epochs)
-    test_losses = np.zeros(epochs)
-    flag = True
-    for it in range(epochs):
-        model.train()
-        if flag is True:
-            t0 = datetime.now()
-            flag = False
-        train_loss = []
-        for inputs1, inputs2, targets in zip(X_train1, X_train2, y_train):
-            # move data to GPU
-            inputs1, inputs2, targets = inputs1.to(device), inputs2.to(device), targets.to(device)
-
-            # zero the parameter gradients
-            optimizer.zero_grad()
-
-            # Forward pass
-            outputs = model(inputs1, inputs2)
-            loss = criterion(outputs, targets)
-
-            # Backward and optimize
-            loss.backward()
-            optimizer.step()
-
-            train_loss.append(loss.item())
-
-        # Get train loss and test loss
-        train_loss = np.mean(train_loss)
-
-        model.eval()
-        with torch.no_grad():
-            test_loss = []
-            for inputs1, inputs2, targets in zip(X_test1, X_test2, y_test):
-                inputs1, inputs2, targets = inputs1.to(device), inputs2.to(device), targets.to(device)
-                outputs = model(inputs1, inputs2)
-                loss = criterion(outputs, targets)
-                test_loss.append(loss.item())
-        test_loss = np.mean(test_loss)
-
-        # Save losses
-        train_losses[it] = train_loss
-        test_losses[it] = test_loss
-        # Learning Decay step
-        scheduler.step()
-        if (it + 1) % 5 == 0:
-            dt = datetime.now() - t0
-            flag = True
-            print(
-                f'Epoch {it + 1}/{epochs}, Train Loss: {train_loss:.10f},Test Loss: {test_loss:.10f}, Duration: {dt}')
-
-    return train_losses, test_losses
-
 
 ################## Functions ##################
 
@@ -166,7 +104,9 @@ def VAF(true, predicted, LS):
 
 ################## Main ##################
 # load
-V = load('V_test.npy')
+path = os.getcwd()
+path = os.path.abspath(os.path.join(path, os.pardir))
+V = load(path + '\dataset\Test\V_test.npy')
 
 # DVL speed to beams
 b1 = np.array([cos((45 + 0 * 90) * np.pi / 180) * sin(20 * np.pi / 180),
@@ -219,7 +159,7 @@ X_test_DVL = torch.utils.data.DataLoader(dataset=X_test_DVL, batch_size=batch_si
 y_test = torch.utils.data.DataLoader(dataset=y_test, batch_size=batch_size)
 
 # load the model
-model = SmoothNetV2(T)
+model = BeamsNetV2()
 model.load_state_dict(torch.load('BeamsNetV2.pkl'))
 
 # Move to GPU
@@ -234,26 +174,26 @@ with torch.no_grad():
     for inputs1, inputs2, targets in zip(X_test, X_test_DVL, y_test):
         inputs1, inputs2, targets = inputs1.to(device), inputs2.to(device), targets.to(device)
         validation_predictions.append(model(inputs1, inputs2).cpu().numpy())
-validation_predictions = np.asarray(validation_predictions)
+validation_predictions = np.asarray(validation_predictions,dtype=object)
 validation_predictions = np.concatenate(validation_predictions, axis=0)
 
 predicted_v = np.zeros((N, 3))
-predicted_v_noise = np.zeros((N, 3))
+LS_v = np.zeros((N, 3))
 gt_v = np.zeros((N, 3))
 for i in range(N):
     predicted_v[i, :] = validation_predictions[i, :]
-    predicted_v_noise[i, :] = np.matmul(p_inv, transpose(s2[i, :]))
+    LS_v[i, :] = np.matmul(p_inv, transpose(s2[i, :]))
     gt_v[i, :] = sy[i, :]
 
 # Rmse of the prediction
-rmse_ls, rmse_predicted, improv = RMSE(gt_v, predicted_v, predicted_v_noise)
-mae_ls, mae_predicted = MAE(gt_v, predicted_v, predicted_v_noise)
-r2_ls, r2_predicted = NSE_R2(gt_v, predicted_v, predicted_v_noise)
-vaf_ls, vaf_predicted = VAF(gt_v, predicted_v, predicted_v_noise)
+rmse_ls, rmse_predicted, improv = RMSE(gt_v, predicted_v, LS_v)
+mae_ls, mae_predicted = MAE(gt_v, predicted_v, LS_v)
+r2_ls, r2_predicted = NSE_R2(gt_v, predicted_v, LS_v)
+vaf_ls, vaf_predicted = VAF(gt_v, predicted_v, LS_v)
 
 df = pd.DataFrame(
     np.array([[rmse_predicted, mae_predicted, r2_predicted, vaf_predicted], [rmse_ls, mae_ls, r2_ls, vaf_ls]]),
     pd.Index([
         'Network prediction', 'Least Squares solution']), columns=['RMSE', 'MAE', 'NSE', 'VAF'])
-print('SmoothNet and Least Squares Results: ')
+print('BeamsNetV2 and Least Squares Results: ')
 print(df)
