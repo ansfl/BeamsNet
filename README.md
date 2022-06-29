@@ -37,6 +37,7 @@ Instruments, Navigator DVL.
 
 ![Alt text](/Figures/snapir.jpg "Snapir AUV")
 
+**Additional information regarding the dataset is located in the _dataset_ folder.**
 
 
 ## Architectures
@@ -62,3 +63,5 @@ the BeamsNetV1 architecture, the input goes through a one-dimensional convolutio
 layer is flattened and passes through two fully connected layers. After that,
 the current DVL measurement is combined with the last fully connected layer
 output and goes into the last fully connected layer that generates the output
+
+**A code for networks is provided and can be seen in the _code_ folder with additional information.**
