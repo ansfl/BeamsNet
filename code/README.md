@@ -1,0 +1,1 @@
+BeamsNetV1.pkl is the weights of BeamsNetV1
