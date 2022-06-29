@@ -35,7 +35,7 @@ rating of 3000[m]. Snapir carries several sensors as its payload, including an
 interferometric authorized synthetic aperture sonar (SAS) and Teledyne RD
 Instruments, Navigator DVL.
 
-![Alt text](/Figures/snapir.png "Snapir AUV")
+![Alt text](/Figures/snapir.jpg "Snapir AUV")
 
 
 
