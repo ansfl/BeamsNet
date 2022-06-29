@@ -1,14 +1,11 @@
 ################## Imports ##################
 
 import torch
-import scipy
-from scipy.fft import fft, ifft, fftshift, ifftshift
 import torch.nn as nn
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
+import os
 import torch.nn.functional as F
-from numpy import save
 from numpy import load
 from numpy import transpose
 from numpy import cos
@@ -16,12 +13,8 @@ from numpy import sin
 from numpy.random.mtrand import random
 from numpy.linalg import inv
 from sklearn.metrics import mean_squared_error
-import random
 from numpy import linalg as LA
-from torch.utils.data import Dataset, DataLoader
-from datetime import datetime
-from torch.optim.lr_scheduler import ExponentialLR
-from torch.optim.lr_scheduler import StepLR
+from torch.utils.data import Dataset
 import seaborn as sns
 
 sns.set()
@@ -123,8 +116,10 @@ class BeamsNetV1(nn.Module):
 ################# MAIN ################
 
 # load
-IMU_in = load('IMU_in_test.npy')
-V = load('V_test.npy')
+path = os.getcwd()
+path = os.path.abspath(os.path.join(path, os.pardir))
+IMU_in = load(path + '\dataset\Test\IMU_in_test.npy')
+V = load(path + '\dataset\Test\V_test.npy')
 
 # DVL speed to beams
 b1 = np.array([cos((45 + 0 * 90) * np.pi / 180) * sin(20 * np.pi / 180),
@@ -186,7 +181,7 @@ y_test = torch.utils.data.DataLoader(dataset=y_test, batch_size=batch_size)
 model = BeamsNetV1()
 model.load_state_dict(torch.load('BeamsNetV1.pkl'))
 
-# Move to GPU
+# Move to GPU/CPU
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 model.to(device)
 
@@ -201,30 +196,22 @@ validation_predictions = np.asarray(validation_predictions, dtype=object)
 validation_predictions = np.concatenate(validation_predictions, axis=0)
 
 predicted_v = np.zeros((N, 3))
-predicted_v_noise = np.zeros((N, 3))
+LS_v = np.zeros((N, 3))
 gt_v = np.zeros((N, 3))
 for i in range(N):
     predicted_v[i, :] = validation_predictions[i, :]
-    predicted_v_noise[i, :] = np.matmul(p_inv, transpose(s2[i, :]))
+    LS_v[i, :] = np.matmul(p_inv, transpose(s2[i, :]))
     gt_v[i, :] = sy[i, :]
 
 # Rmse of the prediction
-rmse_ls, rmse_predicted, improv = RMSE(gt_v, predicted_v, predicted_v_noise)
-mae_ls, mae_predicted = MAE(gt_v, predicted_v, predicted_v_noise)
-r2_ls, r2_predicted = NSE_R2(gt_v, predicted_v, predicted_v_noise)
-vaf_ls, vaf_predicted = VAF(gt_v, predicted_v, predicted_v_noise)
+rmse_ls, rmse_predicted, improv = RMSE(gt_v, predicted_v, LS_v)
+mae_ls, mae_predicted = MAE(gt_v, predicted_v, LS_v)
+r2_ls, r2_predicted = NSE_R2(gt_v, predicted_v, LS_v)
+vaf_ls, vaf_predicted = VAF(gt_v, predicted_v, LS_v)
 
 df = pd.DataFrame(
     np.array([[rmse_predicted, mae_predicted, r2_predicted, vaf_predicted], [rmse_ls, mae_ls, r2_ls, vaf_ls]]),
     pd.Index([
         'Network prediction', 'Least Squares solution']), columns=['RMSE', 'MAE', 'NSE', 'VAF'])
-print('SmoothNet and Least Squares Results: ')
+print('BeamsNetV1 and Least Squares Results: ')
 print(df)
-
-# plots
-plt.figure()
-plt.plot(LA.norm(predicted_v_noise, axis=1) - LA.norm(gt_v, axis=1), label='LS error')
-plt.plot(LA.norm(predicted_v, axis=1) - LA.norm(gt_v, axis=1), label='DL error')
-# plt.plot(LA.norm(gt_v, axis=1), label='GT')
-plt.legend()
-plt.show()
