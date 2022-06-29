@@ -27,5 +27,5 @@ vector
 
 ## Architectures
 
-![Alt text](/Figures/BeamsNetV1.png "Optional title")
+![Alt text](/Figures/BeamsNetV1.png "BeamsNetV1 architecture")
 
