@@ -11,7 +11,7 @@ seafloor mapping and underwater structure health monitoring. Commonly, an
 inertial navigation system aided by a Doppler velocity log (DVL) is used to
 provide the vehicle’s navigation solution. In such fusion, the DVL provides the
 velocity vector of the AUV, which determines the navigation solution’s accu-
-racy and helps estimate the navigation states. This paper proposes BeamsNet,
+racy and helps estimate the navigation states. In our paper we proposed BeamsNet,
 an end-to-end deep learning framework to regress the estimated DVL velocity
 vector that improves the accuracy of the velocity vector estimate, and could
 replace the model-based approach. Two versions of BeamsNet, differing in their
