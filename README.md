@@ -66,6 +66,11 @@ output and goes into the last fully connected layer that generates the output
 
 **A code for networks is provided and can be seen in the _code_ folder with additional information.**
 
+## Setup
+
+- Download this git repo and run the codes in the code folder.
+- The code is written in python and uses the PyTorch framework.
+
 ## Citation
 If you found the experimental DATA useful for your research or used the BeamsNet architectures and code, please cite our paper:
 
