@@ -2,6 +2,8 @@
 The 4 hours dataset is built from 9 different missions with different parameters regarding the length of the mission,
 the depth, the speed and more.
 
+### How the dataset was divided to train and validation
+
 ![Alt text](/Figures/datasetfig.jpg "Dataset")
   - M.1 = Mission 1, and so on.
 
