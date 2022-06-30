@@ -4,3 +4,5 @@ the depth, the speed and more.
 
 - **Test** folder contains approximately 30 minutes data from Snapir's IMU and DVL.
 The dataset is built from a mission that was executed in another date.
+
+![Alt text](/Figures/datasetfig.jpg "Dataset")
