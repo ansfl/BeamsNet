@@ -65,3 +65,12 @@ the current DVL measurement is combined with the last fully connected layer
 output and goes into the last fully connected layer that generates the output
 
 **A code for networks is provided and can be seen in the _code_ folder with additional information.**
+
+## Citation
+If you found the experimental DATA useful for your research or used the BeamsNet architectures and code, please cite our paper:
+
+    bibtex here
+
+___
+
+![Alt text](/Figures/Logo.png "Logo")
