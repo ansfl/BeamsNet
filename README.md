@@ -74,7 +74,17 @@ output and goes into the last fully connected layer that generates the output
 ## Citation
 If you found the experimental DATA useful for your research or used the BeamsNet architectures and code, please cite our paper:
 
-    bibtex here
+    @article{BeamsNet,
+        doi = {10.48550/ARXIV.2206.13603},
+        url = {https://arxiv.org/abs/2206.13603},
+        author = {Cohen, Nadav and Klein, Itzik},
+        keywords = {Robotics (cs.RO), Machine Learning (cs.LG), Systems and Control (eess.SY), Signal Processing (eess.SP), FOS: Computer and information sciences, FOS: Computer and information sciences, FOS: Electrical engineering, electronic engineering, information engineering, FOS: Electrical engineering, electronic engineering, information engineering},
+        title = {BeamsNet: A data-driven Approach Enhancing Doppler Velocity Log Measurements for Autonomous Underwater Vehicle Navigation},
+        publisher = {arXiv},
+        year = {2022},
+        copyright = {arXiv.org perpetual, non-exclusive license}
+        }
+
 
 ___
 
